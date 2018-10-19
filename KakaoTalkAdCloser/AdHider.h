@@ -12,17 +12,14 @@ namespace kudd {
     public:
         void reset();
         void setKakaoTalkFound() { _kakaoTalkFound = true; }
-        void setAdHidden()       { _adHidden = true;       }
 
         bool kakaoTalkFound() const { return _kakaoTalkFound; }
-        bool adHidden()       const { return _adHidden;       }
 
     private:
         AdHideStatus();
 
     private:
         bool _kakaoTalkFound;
-        bool _adHidden;
     };
 
     class AdHider {
