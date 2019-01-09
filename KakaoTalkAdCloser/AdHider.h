@@ -2,43 +2,63 @@
 
 #include <thread>
 #include <memory>
+#include <atomic>
 
 namespace kudd {
-    class AdHideStatus {
-    public:
-        ~AdHideStatus() {}
-        static AdHideStatus& get();
+    struct AdCloseContext {
+        struct WindowShownState {
+            WindowShownState()
+                : hwnd(nullptr)
+                , found(false)
+            {
+                memset(&lastKnownSize, 0, sizeof(lastKnownSize));
+            }
 
-    public:
-        void reset();
-        void setKakaoTalkFound() { _kakaoTalkFound = true; }
+            HWND hwnd;
+            bool found;
+            RECT lastKnownSize;
+        };
 
-        bool kakaoTalkFound() const { return _kakaoTalkFound; }
+        AdCloseContext(HWND hwnd)
+            : kakaoTalkHwnd(hwnd)
+            , loopCount(0)
+        {
+            memset(&adRect, 0, sizeof(adRect));
+        }
 
-    private:
-        AdHideStatus();
+        HWND kakaoTalkHwnd;
+        uint64_t loopCount;
 
-    private:
-        bool _kakaoTalkFound;
+        WindowShownState ad;
+        WindowShownState lockModeView;
+        WindowShownState onlineView;
+
+        RECT adRect;
     };
 
+    ///////////////////////////////////////////////////////////////////////////
     class AdHider {
     public:
-        AdHider()
+        AdHider(int32_t kakaoWaitSeconds)
             : _running(false)
+            , _kakaoWaitSeconds(kakaoWaitSeconds)
         {}
         virtual ~AdHider();
 
     public:
         void startup();
         void cleanup();
+        void setKakaoWaitSeconds(int32_t seconds) { _kakaoWaitSeconds = seconds; }
 
     private:
         void threadProc();
         void checkKakaoTalkAd();
+        void closeAndResize();
 
     private:
         bool _running;
+        std::atomic_int32_t _kakaoWaitSeconds;
         std::unique_ptr<std::thread> _hiderThread;
+        std::unique_ptr<AdCloseContext> _adCloseCtx;
     };
 }
