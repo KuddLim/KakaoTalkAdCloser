@@ -20,6 +20,10 @@ Settings& Settings::get()
 }
 
 Settings::Settings()
+    : _runWindowsStartup(false)
+    , _runMinimized(false)
+    , _checkUpdate(false)
+    , _kakaoWaitTime(DEFAULT_KAKAO_WAIT_SECONDS)
 {
     loadAll();
 }
