@@ -3,8 +3,24 @@
 #include <thread>
 #include <memory>
 #include <atomic>
+#include <map>
+#include <string>
 
 namespace kudd {
+    struct ChildWindowInfo {
+        std::wstring className;
+        std::wstring caption;
+
+        bool operator ==(const ChildWindowInfo& rhs) const
+        {
+            return className == rhs.className && caption == rhs.caption;
+        }
+        bool operator !=(const ChildWindowInfo& rhs) const
+        {
+            return !operator ==(rhs);
+        }
+    };
+
     struct AdCloseContext {
         struct WindowShownState {
             WindowShownState()
@@ -34,6 +50,8 @@ namespace kudd {
         WindowShownState onlineView;
 
         RECT adRect;
+
+        std::map<HWND, ChildWindowInfo> children;
     };
 
     ///////////////////////////////////////////////////////////////////////////
